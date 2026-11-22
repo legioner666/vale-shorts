@@ -1,7 +1,8 @@
 {
   "ep01": {
     "videoId": "7wU8s2y2v8Y",
-    "state": "pilot-private",
-    "found_by_reconcile": true
+    "state": "published",
+    "found_by_reconcile": true,
+    "note": "made public manually in YouTube Studio on 2026-11-22; robot must not reschedule it"
   }
 }
