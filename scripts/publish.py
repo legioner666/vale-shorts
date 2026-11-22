@@ -191,6 +191,44 @@ def set_thumbnail_if_ready(yt, item, entry):
     return True
 
 
+def video_health(yt, ids):
+    """Status of our videos incl. Content ID blocks (regionRestriction) and rejections."""
+    out = {}
+    for i in range(0, len(ids), 50):
+        for v in yt.videos().list(part="status,contentDetails,processingDetails",
+                                  id=",".join(ids[i:i + 50])).execute().get("items", []):
+            st, cd = v.get("status", {}), v.get("contentDetails", {})
+            rr = cd.get("regionRestriction", {})
+            blocked_n = len(rr.get("blocked", []))
+            allowed = rr.get("allowed")
+            blocked = (allowed is not None and len(allowed) == 0) or blocked_n >= 100 \
+                or st.get("uploadStatus") == "rejected"
+            partial = (not blocked) and (blocked_n > 0 or (allowed is not None and len(allowed) < 100))
+            out[v["id"]] = {"privacy": st.get("privacyStatus"), "upload": st.get("uploadStatus"),
+                            "publishAt": st.get("publishAt"), "rejection": st.get("rejectionReason"),
+                            "processing": v.get("processingDetails", {}).get("processingStatus"),
+                            "blocked_countries": blocked_n, "allowed_countries": None if allowed is None else len(allowed),
+                            "verdict": "BLOCKED" if blocked else ("PARTIAL-BLOCK" if partial else "OK")}
+    return out
+
+
+def write_check(ledger, health):
+    lines = [f"# Video check — {now():%Y-%m-%d %H:%M} UTC", "",
+             "| Part | Verdict | Privacy | Upload | Processing | Publish at | Blocked in | Link |", "|---|---|---|---|---|---|---|---|"]
+    for k, e in ledger.items():
+        h = health.get(e.get("videoId"), {})
+        if not e.get("videoId"):
+            continue
+        where = "all countries" if h.get("verdict") == "BLOCKED" else (f"{h.get('blocked_countries')} countries" if h.get("blocked_countries") else "–")
+        lines.append(f"| {k} | **{h.get('verdict', 'NOT FOUND')}** | {h.get('privacy')} | {h.get('upload')} | {h.get('processing')} | "
+                     f"{h.get('publishAt') or '–'} | {where} | https://youtu.be/{e['videoId']} |")
+    lines += ["", "BLOCKED = Content ID or rejection blocks the video everywhere. The queue unschedules such videos automatically."]
+    os.makedirs(P("reports"), exist_ok=True)
+    with open(P("reports", "CHECK.md"), "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    log("\n".join(lines))
+
+
 # ---------- validation ----------
 def validate(meta, sched, settings, sums, need_files=False):
     items = {i["key"]: i for i in meta["items"]}
@@ -212,7 +250,7 @@ def validate(meta, sched, settings, sums, need_files=False):
 # ---------- modes ----------
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mode", required=True, choices=["verify", "dry-run", "pilot", "queue", "report"])
+    ap.add_argument("--mode", required=True, choices=["verify", "dry-run", "pilot", "queue", "report", "check"])
     ap.add_argument("--item", default=None)
     a = ap.parse_args()
     meta, sched, settings, ledger = load("metadata.json"), load("schedule.json"), load("settings.json"), load("ledger.json")
@@ -240,6 +278,10 @@ def main():
     ch = my_channel(yt)
     if a.mode == "verify":
         log("Token OK."); return
+
+    if a.mode == "check":
+        ids = [e["videoId"] for e in ledger.values() if e.get("videoId")]
+        write_check(ledger, video_health(yt, ids) if ids else {}); return
 
     if a.mode == "pilot":
         key = a.item or settings["pilot_key"]
@@ -269,7 +311,7 @@ def main():
         for s in sorted(sched["items"], key=lambda x: x["publishAt"]):
             key, when = s["key"], parse(s["publishAt"])
             it, e = items[key], ledger.get(key, {})
-            if e.get("state") in ("scheduled", "published", "missed"):
+            if e.get("state") in ("scheduled", "published", "missed", "blocked"):
                 continue
             if (when - t).total_seconds() / 86400 > settings["upload_ahead_days"]:
                 continue
@@ -284,6 +326,9 @@ def main():
                     e = {"videoId": found["id"], "state": "pilot-private", "found_by_reconcile": True}
                 else:
                     log(f"{key}: previous upload state unknown and not found on channel; retrying upload")
+            if e.get("videoId") and video_health(yt, [e["videoId"]]).get(e["videoId"], {}).get("verdict") == "BLOCKED":
+                ledger[key] = {**e, "state": "blocked", "note": "Content ID / rejection blocks it worldwide; not scheduled"}
+                save_ledger(ledger); log(f"{key}: BLOCKED on YouTube — not scheduling"); continue
             if e.get("videoId"):
                 # already on YouTube (pilot or reconciled): schedule it instead of uploading again
                 v = yt.videos().list(part="status", id=e["videoId"]).execute()["items"][0]
@@ -309,6 +354,20 @@ def main():
                            "publishAt": s["publishAt"], "youtube_publishAt": got, "uploaded": now().isoformat()}
             save_ledger(ledger); done += 1
             log(f"{key}: {'scheduled' if ok else 'UPLOADED BUT publishAt NOT CONFIRMED'} {got}  https://youtu.be/{r['id']}")
+
+    # unschedule anything that got blocked after upload (Content ID runs after processing)
+    waiting = [k for k, e in ledger.items() if e.get("state") in ("scheduled", "check-in-studio") and e.get("videoId")]
+    if waiting:
+        h = video_health(yt, [ledger[k]["videoId"] for k in waiting])
+        for k in waiting:
+            if h.get(ledger[k]["videoId"], {}).get("verdict") == "BLOCKED":
+                yt.videos().update(part="status", body={"id": ledger[k]["videoId"], "status": {
+                    "privacyStatus": "private", "selfDeclaredMadeForKids": common["selfDeclaredMadeForKids"],
+                    "containsSyntheticMedia": common["containsSyntheticMedia"]}}).execute()
+                ledger[k].update(state="blocked", note="blocked worldwide after upload; schedule removed, stays private")
+                save_ledger(ledger); log(f"{k}: BLOCKED — publish date removed, video stays private")
+        ids = [e["videoId"] for e in ledger.values() if e.get("videoId")]
+        write_check(ledger, video_health(yt, ids))
 
     # thumbnails for anything already on YouTube
     for key, e in ledger.items():
