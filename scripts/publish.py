@@ -99,16 +99,36 @@ def sha256(path):
 
 
 def ensure_media(name, settings, sums):
-    os.makedirs(MEDIA, exist_ok=True)
+    """Episodes are stored in the repo (media/files). The full movie is too big for git, so it is
+    rebuilt from the verified episodes with a lossless stream copy and checked by duration."""
     path = os.path.join(MEDIA, name)
-    if not os.path.exists(path):
-        log(f"Downloading {name} from release {settings['release_tag']} ...")
-        subprocess.run(["gh", "release", "download", settings["release_tag"], "-p", name, "-D", MEDIA, "--clobber"],
-                       check=True)
-    got = sha256(path)
-    if got != sums[name]:
-        sys.exit(f"CHECKSUM MISMATCH for {name}: {got} != {sums[name]}. Nothing was uploaded.")
-    return path
+    if name in sums:
+        if not os.path.exists(path):
+            sys.exit(f"MISSING FILE {path}. Nothing was uploaded.")
+        got = sha256(path)
+        if got != sums[name]:
+            sys.exit(f"CHECKSUM MISMATCH for {name}: {got} != {sums[name]}. Nothing was uploaded.")
+        return path
+    mv = settings["movie"]
+    if name != mv["file"]:
+        sys.exit(f"{name} is neither in media/checksums.sha256 nor the movie. Nothing was uploaded.")
+    import shutil, tempfile
+    if not shutil.which("ffmpeg"):
+        subprocess.run(["sudo", "apt-get", "install", "-y", "-qq", "ffmpeg"], check=True,
+                       stdout=subprocess.DEVNULL)
+    parts = [ensure_media(p, settings, sums) for p in mv["parts"]]
+    out = os.path.join(tempfile.gettempdir(), name)
+    lst = out + ".txt"
+    with open(lst, "w") as f:
+        f.writelines(f"file '{os.path.abspath(p)}'\n" for p in parts)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy",
+                    "-movflags", "+faststart", out], check=True)
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", out],
+                               capture_output=True, text=True, check=True).stdout)
+    if abs(dur - mv["duration_s"]) > 1.0:
+        sys.exit(f"MOVIE BUILD FAILED: duration {dur:.2f}s, expected {mv['duration_s']}s. Nothing was uploaded.")
+    log(f"Movie rebuilt from {len(parts)} episodes: {dur:.2f}s")
+    return out
 
 
 # ---------- YouTube operations ----------
@@ -181,7 +201,8 @@ def validate(meta, sched, settings, sums, need_files=False):
         if len(it["title"]) > 100: errs.append(f"{s['key']}: title > 100 chars")
         if len(it["description"]) > 5000: errs.append(f"{s['key']}: description > 5000 chars")
         if "{CHAPTERS}" in it["description"]: errs.append(f"{s['key']}: description still has {{CHAPTERS}} placeholder")
-        if it["file"] not in sums: errs.append(f"{s['key']}: {it['file']} missing from media/checksums.sha256")
+        if it["file"] not in sums and it["file"] != settings.get("movie", {}).get("file"):
+            errs.append(f"{s['key']}: {it['file']} missing from media/checksums.sha256")
         parse(s["publishAt"])
     if errs:
         sys.exit("VALIDATION FAILED:\n  " + "\n  ".join(errs))

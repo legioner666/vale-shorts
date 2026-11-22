@@ -4,6 +4,30 @@
   "upload_ahead_days": 3,
   "max_uploads_per_run": 3,
   "min_lead_minutes": 60,
-  "release_tag": "media-v1",
-  "pilot_key": "ep01"
+  "pilot_key": "ep01",
+  "movie": {
+    "file": "Vale_Full_Movie.mp4",
+    "parts": [
+      "Vale_Ep01.mp4",
+      "Vale_Ep02.mp4",
+      "Vale_Ep03.mp4",
+      "Vale_Ep04.mp4",
+      "Vale_Ep05.mp4",
+      "Vale_Ep06.mp4",
+      "Vale_Ep07.mp4",
+      "Vale_Ep08.mp4",
+      "Vale_Ep09.mp4",
+      "Vale_Ep10.mp4",
+      "Vale_Ep11.mp4",
+      "Vale_Ep12.mp4",
+      "Vale_Ep13.mp4",
+      "Vale_Ep14.mp4",
+      "Vale_Ep15.mp4",
+      "Vale_Ep16.mp4",
+      "Vale_Ep17.mp4",
+      "Vale_Ep18.mp4",
+      "Vale_Ep19.mp4"
+    ],
+    "duration_s": 1611.02
+  }
 }
