@@ -9,7 +9,7 @@ on:
         description: "verify = check token · dry-run = check without uploading · pilot = private test upload · queue = upload due items · report = refresh report"
         type: choice
         options: [verify, dry-run, pilot, queue, report]
-        default: dry-run
+        default: queue
       item:
         description: "For pilot only (default ep01)"
         required: false
