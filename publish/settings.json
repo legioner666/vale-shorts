@@ -4,7 +4,7 @@
   "upload_ahead_days": 3,
   "max_uploads_per_run": 3,
   "min_lead_minutes": 60,
-  "pilot_key": "ep01",
+  "pilot_key": "ep02",
   "movie": {
     "file": "Vale_Full_Movie.mp4",
     "parts": [
@@ -28,6 +28,6 @@
       "Vale_Ep18.mp4",
       "Vale_Ep19.mp4"
     ],
-    "duration_s": 1611.02
+    "duration_s": 1610.78
   }
 }
