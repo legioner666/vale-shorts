@@ -38,5 +38,6 @@ jobs:
         run: |
           git config user.name "publish-bot"
           git config user.email "publish-bot@users.noreply.github.com"
-          git add publish/ledger.json reports/REPORT.md 2>/dev/null || true
+          git add publish/ledger.json
+          if [ -f reports/REPORT.md ]; then git add reports/REPORT.md; fi
           git diff --cached --quiet || (git commit -m "publish: $MODE $(date -u +%F)" && git push)
