@@ -1,0 +1,55 @@
+name: publish
+
+on:
+  schedule:
+    - cron: "17 6 * * *"   # every day 06:17 UTC: upload what's due in the next days + refresh report
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "verify = check token · dry-run = check without uploading · pilot = private test upload · queue = upload due items · report = refresh report"
+        type: choice
+        options: [verify, dry-run, pilot, queue, report]
+        default: dry-run
+      item:
+        description: "For pilot only (default ep01)"
+        required: false
+        default: ""
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+      YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+      YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+      YT_CHANNEL_ID: ${{ vars.YT_CHANNEL_ID }}
+      GH_TOKEN: ${{ github.token }}
+      MODE: ${{ github.event_name == 'schedule' && 'queue' || inputs.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -q -r requirements.txt
+      - name: Run
+        run: |
+          ITEM="${{ inputs.item }}"
+          python scripts/publish.py --mode "$MODE" ${ITEM:+--item "$ITEM"}
+      - name: Report
+        if: always() && env.MODE == 'queue'
+        run: python scripts/publish.py --mode report || echo "report skipped"
+      - name: Save ledger and report
+        if: always()
+        run: |
+          git config user.name "publish-bot"
+          git config user.email "publish-bot@users.noreply.github.com"
+          git add publish/ledger.json reports/REPORT.md 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "publish: $MODE $(date -u +%F)" && git push)

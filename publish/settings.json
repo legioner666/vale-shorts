@@ -1,0 +1,9 @@
+{
+  "approved": false,
+  "paused": false,
+  "upload_ahead_days": 3,
+  "max_uploads_per_run": 3,
+  "min_lead_minutes": 60,
+  "release_tag": "media-v1",
+  "pilot_key": "ep01"
+}
