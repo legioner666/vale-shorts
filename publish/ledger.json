@@ -4,5 +4,10 @@
     "state": "published",
     "found_by_reconcile": true,
     "note": "made public manually in YouTube Studio on 2026-11-22; robot must not reschedule it"
+  },
+  "ep02": {
+    "videoId": "xnQj9BYZLUs",
+    "state": "pilot-private",
+    "uploaded": "2026-11-22T12:39:52.202678+00:00"
   }
 }
