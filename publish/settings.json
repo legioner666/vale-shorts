@@ -1,6 +1,6 @@
 {
   "approved": true,
-  "paused": false,
+  "paused": true,
   "upload_ahead_days": 3,
   "max_uploads_per_run": 3,
   "min_lead_minutes": 60,
