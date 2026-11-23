@@ -7,7 +7,22 @@
   },
   "ep02": {
     "videoId": "xnQj9BYZLUs",
-    "state": "pilot-private",
-    "uploaded": "2026-11-22T12:39:52.202678+00:00"
+    "state": "missed",
+    "uploaded": "2026-11-22T12:39:52.202678+00:00",
+    "note": "publishAt 2026-11-23T18:00:00Z too close or past at 2026-11-23T18:27:57.563448+00:00; edit schedule.json and set state back"
+  },
+  "ep03": {
+    "videoId": "I165W9RALoE",
+    "state": "scheduled",
+    "publishAt": "2026-11-24T22:00:00Z",
+    "youtube_publishAt": "2026-11-24T22:00:00Z",
+    "uploaded": "2026-11-23T18:28:00.629252+00:00"
+  },
+  "ep04": {
+    "videoId": "dAmHEVzQtKw",
+    "state": "scheduled",
+    "publishAt": "2026-11-25T18:00:00Z",
+    "youtube_publishAt": "2026-11-25T18:00:00Z",
+    "uploaded": "2026-11-23T18:28:04.007101+00:00"
   }
 }
