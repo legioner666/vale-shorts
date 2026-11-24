@@ -24,5 +24,12 @@
     "publishAt": "2026-11-25T18:00:00Z",
     "youtube_publishAt": "2026-11-25T18:00:00Z",
     "uploaded": "2026-11-23T18:28:04.007101+00:00"
+  },
+  "ep05": {
+    "videoId": "JULLCoCVhOI",
+    "state": "scheduled",
+    "publishAt": "2026-11-26T22:00:00Z",
+    "youtube_publishAt": "2026-11-26T22:00:00Z",
+    "uploaded": "2026-11-24T17:57:59.264977+00:00"
   }
 }

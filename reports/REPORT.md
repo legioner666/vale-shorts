@@ -1,15 +1,15 @@
 # FulFilms  — daily report
-Updated: 2026-11-23 18:28 UTC. Data API counters are near-real-time; retention and engaged views are only in YouTube Studio → Analytics.
+Updated: 2026-11-24 17:58 UTC. Data API counters are near-real-time; retention and engaged views are only in YouTube Studio → Analytics.
 
-**Subscribers:** 16  ·  **Channel views:** 0  ·  **Videos:** 2
+**Subscribers:** 16  ·  **Channel views:** 24  ·  **Videos:** 0
 
 | Part | Status | Publish (UTC) | Views | Likes | Comments | Link |
 |---|---|---|---|---|---|---|
-| ep01 | public | 2026-11-22 09:44 | 6 | 1 | 0 | https://youtu.be/7wU8s2y2v8Y |
-| ep02 | public | 2026-11-23 18:00 | 8 | 1 | 0 | https://youtu.be/xnQj9BYZLUs |
+| ep01 | public | 2026-11-22 09:44 | 14 | 1 | 0 | https://youtu.be/7wU8s2y2v8Y |
+| ep02 | public | 2026-11-23 18:00 | 20 | 1 | 0 | https://youtu.be/xnQj9BYZLUs |
 | ep03 | scheduled | 2026-11-24 22:00 | 0 | 0 | 0 | https://youtu.be/I165W9RALoE |
 | ep04 | scheduled | 2026-11-25 18:00 | 0 | 0 | 0 | https://youtu.be/dAmHEVzQtKw |
-| ep05 | not uploaded | 2026-11-26 22:00 | – | – | – |  |
+| ep05 | scheduled | 2026-11-26 22:00 | 0 | 0 | 0 | https://youtu.be/JULLCoCVhOI |
 | ep06 | not uploaded | 2026-11-27 18:00 | – | – | – |  |
 | ep07 | not uploaded | 2026-11-28 22:00 | – | – | – |  |
 | ep08 | not uploaded | 2026-11-29 18:00 | – | – | – |  |
