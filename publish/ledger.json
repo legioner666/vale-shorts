@@ -7,9 +7,9 @@
   },
   "ep02": {
     "videoId": "xnQj9BYZLUs",
-    "state": "missed",
+    "state": "published",
     "uploaded": "2026-11-22T12:39:52.202678+00:00",
-    "note": "publishAt 2026-11-23T18:00:00Z too close or past at 2026-11-23T18:27:57.563448+00:00; edit schedule.json and set state back"
+    "note": "published manually in Studio on 2026-11-23 after the slot was missed"
   },
   "ep03": {
     "videoId": "I165W9RALoE",
