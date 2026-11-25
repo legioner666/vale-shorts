@@ -20,7 +20,7 @@
   },
   "ep04": {
     "videoId": "dAmHEVzQtKw",
-    "state": "scheduled",
+    "state": "published",
     "publishAt": "2026-11-25T18:00:00Z",
     "youtube_publishAt": "2026-11-25T18:00:00Z",
     "uploaded": "2026-11-23T18:28:04.007101+00:00"
@@ -38,5 +38,12 @@
     "publishAt": "2026-11-27T18:00:00Z",
     "youtube_publishAt": "2026-11-27T18:00:00Z",
     "uploaded": "2026-11-25T03:38:26.132546+00:00"
+  },
+  "ep07": {
+    "videoId": "foQglkSCimU",
+    "state": "scheduled",
+    "publishAt": "2026-11-28T22:00:00Z",
+    "youtube_publishAt": "2026-11-28T22:00:00Z",
+    "uploaded": "2026-11-25T22:45:40.258457+00:00"
   }
 }
