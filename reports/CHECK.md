@@ -1,4 +1,4 @@
-# Video check — 2026-11-26 22:36 UTC
+# Video check — 2026-11-27 02:59 UTC
 
 | Part | Verdict | Privacy | Upload | Processing | Publish at | Blocked in | Link |
 |---|---|---|---|---|---|---|---|
@@ -9,6 +9,6 @@
 | ep05 | **OK** | public | processed | succeeded | – | – | https://youtu.be/JULLCoCVhOI |
 | ep06 | **OK** | private | processed | succeeded | 2026-11-27T18:00:00Z | – | https://youtu.be/3Kmxqm-ta2g |
 | ep07 | **OK** | private | processed | succeeded | 2026-11-28T22:00:00Z | – | https://youtu.be/foQglkSCimU |
-| ep08 | **OK** | private | uploaded | processing | 2026-11-29T18:00:00Z | – | https://youtu.be/EomJveVqVJo |
+| ep08 | **OK** | private | processed | succeeded | 2026-11-29T18:00:00Z | – | https://youtu.be/EomJveVqVJo |
 
 BLOCKED = Content ID or rejection blocks the video everywhere. The queue unschedules such videos automatically.
